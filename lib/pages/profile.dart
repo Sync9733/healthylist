@@ -1,10 +1,8 @@
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthylist/colors/colors.dart';
-import 'package:healthylist/pages/login.dart';
-import 'package:healthylist/pages/welcome.dart';
 import 'package:line_icons/line_icons.dart';
 
 class SetupProfile extends StatefulWidget {
@@ -16,22 +14,53 @@ class SetupProfile extends StatefulWidget {
 
 class _SetupProfileState extends State<SetupProfile> {
   final user = FirebaseAuth.instance.currentUser!;
+  final _userNameController = TextEditingController();
+  final _weightController = TextEditingController();
+  final _heightController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    //findDisplayName();
+  void dispose() {
+    _userNameController.dispose();
+    _weightController.dispose();
+    super.dispose();
   }
 
-  //Future<void> findDisplayName() async {
+  Future signUp() async {
+    // autenticate user
+    // create user
+    try {
+      //update user details
+      updateUserDetails(
+          _userNameController.text.trim(),
+          int.parse(_weightController.text.trim()),
+          int.parse(_heightController.text.trim()));
+      //Show Error
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text('Success'),
+          );
+        },
+      );
+    } on FirebaseAuthException catch (e) {
+      print(e);
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: Text(e.message.toString()),
+          );
+        },
+      );
+    }
+  }
 
-  //FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  //User firebaseUser = await firebaseAuth.currentUser();
-  //setState(() {
-  //login = firebaseUser.displayName;
-  //});
-  //print('login = $login');
-  //}
+  Future updateUserDetails(String userName, int weight, int height) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .add({'user name': userName, 'weight': weight, 'height': height});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,433 +68,52 @@ class _SetupProfileState extends State<SetupProfile> {
     return Scaffold(
       // ------------------------------------ Appbar ------------------------------------
       appBar: AppBar(
-        backgroundColor: secondary,
-        title: Text(
-          user.email!,
-          style: TextStyle(fontSize: 16),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 15.0),
-            child: GestureDetector(
-              onTap: () {
-                FirebaseAuth.instance.signOut();
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => WelcomePage()));
-              },
-              child: Icon(LineIcons.alternateSignOut),
-            ),
-          ),
-        ],
         automaticallyImplyLeading: false,
-      ),
-      // ------------------------------------ Welcome ------------------------------------\
-      body: SafeArea(
-          child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'ยินดีต้อนรับ',
-                        style: GoogleFonts.getFont('Poppins', fontSize: 14),
-                      ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        'ชื่อผู้ใช้งาน',
-                        style: GoogleFonts.getFont(
-                          'Poppins',
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                        color: black.withOpacity(0.02),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Center(
-                      child: Icon(LineIcons.bell),
+        backgroundColor: white,
+        elevation: 0,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Container(
+                  width: 35,
+                  height: 35,
+                  decoration: BoxDecoration(
+                      color: black.withOpacity(0.03),
+                      borderRadius: BorderRadius.circular(5)),
+                  child: Center(
+                    child: Icon(
+                      LineIcons.arrowLeft,
+                      size: 22,
+                      color: black.withOpacity(0.3),
                     ),
-                  )
-                ],
-              ),
-              // ------------------------------------ BMI ------------------------------------
-              SizedBox(
-                height: 30,
-              ),
-              Container(
-                width: double.infinity,
-                height: 145,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  gradient: LinearGradient(
-                    colors: [secondary, primary],
                   ),
-                ),
+                )),
+            Padding(
+              padding: const EdgeInsets.only(right: 135.0),
+              child: Text(
+                "Edit Profile",
+                style: TextStyle(
+                    fontSize: 17, fontWeight: FontWeight.bold, color: black),
+              ),
+            ),
+          ],
+        ),
+      ),
+      // ------------------------------------ Profile ------------------------------------\
+      body: SingleChildScrollView(
+        child: Column(children: [
+          SizedBox(
+            height: 7.5,
+          ),
+          SingleChildScrollView(
+            child: Container(
+              child: Flexible(
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    children: [
-                      Flexible(
-                        child: Container(
-                          width: (size.width),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'BMI (Body Massive Index)',
-                                style: GoogleFonts.getFont('Poppins',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: white),
-                              ),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              Text(
-                                'คุณมีน้ำหนักอยู่ในเกณฑ์ปกติ',
-                                style: GoogleFonts.getFont('Poppins',
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                    color: white),
-                              ),
-                              SizedBox(
-                                height: 19,
-                              ),
-                              Container(
-                                width: 95,
-                                height: 35,
-                                decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                        colors: [fourthColor, thirdColor]),
-                                    borderRadius: BorderRadius.circular(20)),
-                                child: Center(
-                                  child: Text(
-                                    'ดูเพิ่มเติม',
-                                    style: GoogleFonts.getFont('Poppins',
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                        color: white),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [fourthColor, thirdColor],
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            '20.3',
-                            style: GoogleFonts.getFont('Poppins',
-                                fontSize: 18,
-                                fontWeight: FontWeight.w400,
-                                color: white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // ------------------------------------ Today Target ------------------------------------
-              SizedBox(
-                height: 30,
-              ),
-              Container(
-                width: double.infinity,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: secondary.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'เป้าหมายวันนี้',
-                        style: GoogleFonts.getFont('Poppins',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: black),
-                      ),
-                      Container(
-                        width: 70,
-                        height: 35,
-                        decoration: BoxDecoration(
-                          gradient:
-                              LinearGradient(colors: [secondary, primary]),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'ตรวจสอบ',
-                            style: GoogleFonts.getFont('Poppins',
-                                fontSize: 12, color: white),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // ------------------------------------ Lastest workout ------------------------------------
-              SizedBox(
-                height: 30,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "การออกกำลังกายล่าสุด",
-                    style: GoogleFonts.getFont('Poppins',
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: black),
-                  ),
-                  Text(
-                    "ดูเพิ่มเติม",
-                    style: GoogleFonts.getFont('Poppins',
-                        fontSize: 13, color: black.withOpacity(0.5)),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              // ------------------------------------ Full body workout ------------------------------------
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: white,
-                    boxShadow: [
-                      BoxShadow(
-                          color: black.withOpacity(0.01),
-                          spreadRadius: 20,
-                          blurRadius: 10,
-                          offset: Offset(0, 10))
-                    ],
-                    borderRadius: BorderRadius.circular(15)),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage('images/workout_1.png'))),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Flexible(
-                        child: Container(
-                          height: 62,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "การออกกำลังกายทั้งตัว",
-                                style: GoogleFonts.getFont('Poppins',
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: black),
-                              ),
-                              Text(
-                                "180 Calories Burn | 32 นาที",
-                                style: GoogleFonts.getFont('Poppins',
-                                    fontSize: 12,
-                                    color: black.withOpacity(0.5)),
-                              ),
-                              Stack(
-                                children: [
-                                  Container(
-                                    width: double.infinity,
-                                    height: 10,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
-                                        color: bgTextField),
-                                  ),
-                                  Container(
-                                    width: size.width * 0.2,
-                                    height: 10,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
-                                        gradient: LinearGradient(
-                                          colors: [thirdColor, primary],
-                                        )),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: fourthColor),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.arrow_forward_ios,
-                            size: 11,
-                            color: thirdColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 13,
-              ),
-              // ------------------------------------ Lower body workout ------------------------------------
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: white,
-                    boxShadow: [
-                      BoxShadow(
-                          color: black.withOpacity(0.01),
-                          spreadRadius: 20,
-                          blurRadius: 10,
-                          offset: Offset(0, 10))
-                    ],
-                    borderRadius: BorderRadius.circular(15)),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage('images/workout_2.png'))),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Flexible(
-                        child: Container(
-                          height: 62,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "การออกกำลังกายเฉพาะช่วงล่าง",
-                                style: GoogleFonts.getFont('Poppins',
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: black),
-                              ),
-                              Text(
-                                "200 Calories Burn | 40 นาที",
-                                style: GoogleFonts.getFont('Poppins',
-                                    fontSize: 12,
-                                    color: black.withOpacity(0.5)),
-                              ),
-                              Stack(
-                                children: [
-                                  Container(
-                                    width: double.infinity,
-                                    height: 10,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
-                                        color: bgTextField),
-                                  ),
-                                  Container(
-                                    width: size.width * 0.3,
-                                    height: 10,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
-                                        gradient: LinearGradient(
-                                          colors: [thirdColor, primary],
-                                        )),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: fourthColor),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.arrow_forward_ios,
-                            size: 11,
-                            color: thirdColor,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 13,
-              ),
-              // ------------------------------------ AB workout ------------------------------------
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: white,
-                    boxShadow: [
-                      BoxShadow(
-                          color: black.withOpacity(0.01),
-                          spreadRadius: 20,
-                          blurRadius: 10,
-                          offset: Offset(0, 10))
-                    ],
-                    borderRadius: BorderRadius.circular(15)),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.only(left: 20, top: 15),
                   child: Row(
                     children: [
                       Container(
@@ -480,73 +128,25 @@ class _SetupProfileState extends State<SetupProfile> {
                       ),
                       Flexible(
                         child: Container(
-                          height: 62,
+                          height: 45,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "การออกกำลังกายหน้าท้อง",
+                                "ชื่อผู้ใช้งาน",
                                 style: GoogleFonts.getFont('Poppins',
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
                                     color: black),
                               ),
                               Text(
-                                "180 Calories Burn | 20 นาที",
+                                user.email!,
                                 style: GoogleFonts.getFont('Poppins',
                                     fontSize: 12,
                                     color: black.withOpacity(0.5)),
                               ),
-                              Stack(
-                                children: [
-                                  Container(
-                                    width: double.infinity,
-                                    height: 10,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
-                                        color: bgTextField),
-                                  ),
-                                  Container(
-                                    width: size.width * 0.15,
-                                    height: 10,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
-                                        gradient: LinearGradient(
-                                          colors: [thirdColor, primary],
-                                        )),
-                                  ),
-                                ],
-                              ),
                             ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      // ------------------------------------ ปุ่มกดเล่น ------------------------------------
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => WelcomePage()));
-                        },
-                        // ------------------------------------ ปุ่มกดเล่น ------------------------------------
-                        child: Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: fourthColor),
-                          ),
-                          child: Center(
-                            child: Icon(
-                              Icons.arrow_forward_ios,
-                              size: 11,
-                              color: thirdColor,
-                            ),
                           ),
                         ),
                       ),
@@ -554,41 +154,260 @@ class _SetupProfileState extends State<SetupProfile> {
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-      )),
-      // ------------------------------------ Bottom Navigation Bar ------------------------------------
 
-      bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: white,
-        color: secondary,
-        animationDuration: Duration(milliseconds: 300),
-        onTap: (index) {
-          print(index);
-        },
-        items: [
-          Icon(
-            LineIcons.home,
-            color: white,
-            size: 30,
+          // ------------------------------------ Height ------------------------------------\
+          SingleChildScrollView(
+            child: Container(
+              child: Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 67.0),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 85,
+                          height: 65,
+                          decoration: BoxDecoration(
+                            color: white,
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: black.withOpacity(0.1),
+                                  spreadRadius: 1,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 10))
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 18, top: 14),
+                            child: Row(
+                              children: [
+                                Flexible(
+                                  child: Container(
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          "180cm",
+                                          style: GoogleFonts.getFont('Poppins',
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: secondary),
+                                        ),
+                                        Text(
+                                          "Height",
+                                          style: GoogleFonts.getFont('Poppins',
+                                              fontSize: 12,
+                                              color: black.withOpacity(0.5)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 30,
+                        ),
+                        // ------------------------------------ Weight ------------------------------------\
+                        Container(
+                          width: 85,
+                          height: 65,
+                          decoration: BoxDecoration(
+                            color: white,
+                            borderRadius: BorderRadius.circular(15),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: black.withOpacity(0.1),
+                                  spreadRadius: 1,
+                                  blurRadius: 8,
+                                  offset: Offset(0, 10))
+                            ],
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 22, top: 14),
+                            child: Row(
+                              children: [
+                                Flexible(
+                                  child: Container(
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          "90kg",
+                                          style: GoogleFonts.getFont('Poppins',
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: secondary),
+                                        ),
+                                        Text(
+                                          "Weight",
+                                          style: GoogleFonts.getFont('Poppins',
+                                              fontSize: 12,
+                                              color: black.withOpacity(0.5)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
-          Icon(
-            LineIcons.dumbbell,
-            color: white,
-            size: 30,
+
+          SizedBox(
+            height: 25,
           ),
-          Icon(
-            LineIcons.map,
-            color: white,
-            size: 30,
+          // ------------------------------------ username ------------------------------------\
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  border: Border.all(color: white),
+                  borderRadius: BorderRadius.circular(12)),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15.0),
+                    child: Icon(
+                      LineIcons.weight,
+                      color: black.withOpacity(0.5),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 15,
+                  ),
+                  Flexible(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'ชื่อผู้ใช้งาน',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          Icon(
-            LineIcons.user,
-            color: white,
-            size: 30,
+          SizedBox(
+            height: 20,
           ),
-        ],
+          // ------------------------------------ น้ำหนัก ------------------------------------\
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  border: Border.all(color: white),
+                  borderRadius: BorderRadius.circular(12)),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15.0),
+                    child: Icon(
+                      LineIcons.weight,
+                      color: black.withOpacity(0.5),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 15,
+                  ),
+                  Flexible(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'น้ำหนัก',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          SizedBox(
+            height: 20,
+          ),
+
+          // ------------------------------------ ส่วนสูง ------------------------------------\
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  border: Border.all(color: white),
+                  borderRadius: BorderRadius.circular(12)),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15.0),
+                    child: Icon(
+                      LineIcons.alternateArrowsVertical,
+                      color: black.withOpacity(0.5),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 15,
+                  ),
+                  Flexible(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'ส่วนสูง',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          SizedBox(
+            height: 35,
+          ),
+          //
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25.0),
+            child: GestureDetector(
+              child: Container(
+                padding: EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [secondary, primary]),
+                    borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 100.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        LineIcons.upload,
+                        color: white,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 5.5, left: 7.0),
+                        child: Text("อัพเดท",
+                            style: GoogleFonts.getFont('Poppins',
+                                color: white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17)),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ]),
       ),
     );
   }

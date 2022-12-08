@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthylist/colors/colors.dart';
+import 'package:healthylist/pages/profile.dart';
+import 'package:healthylist/pages/video_page.dart';
 import 'package:healthylist/pages/welcome.dart';
 import 'package:line_icons/line_icons.dart';
 
@@ -14,24 +17,24 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String login = '...';
   final user = FirebaseAuth.instance.currentUser!;
+
+  List<String> docsIDs = [];
+
+  Future getDocId() async {
+    await FirebaseFirestore.instance.collection('users').get().then(
+          (snapshot) => snapshot.docs.forEach((document) {
+            print(document.reference);
+            docsIDs.add(document.reference.id);
+          }),
+        );
+  }
 
   @override
   void initState() {
+    getDocId();
     super.initState();
-    //findDisplayName();
   }
-
-  //Future<void> findDisplayName() async {
-
-  //FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  //User firebaseUser = await firebaseAuth.currentUser();
-  //setState(() {
-  //login = firebaseUser.displayName;
-  //});
-  //print('login = $login');
-  //}
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +82,7 @@ class _HomePageState extends State<HomePage> {
                         height: 5,
                       ),
                       Text(
-                        'ชื่อผู้ใช้งาน',
+                        ('ชื่อผู้ใช้งาน'),
                         style: GoogleFonts.getFont(
                           'Poppins',
                           fontSize: 20,
@@ -95,7 +98,14 @@ class _HomePageState extends State<HomePage> {
                         color: black.withOpacity(0.02),
                         borderRadius: BorderRadius.circular(12)),
                     child: Center(
-                      child: Icon(LineIcons.bell),
+                      child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SetupProfile()));
+                          },
+                          child: Icon(LineIcons.pen)),
                     ),
                   )
                 ],
@@ -529,7 +539,7 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => WelcomePage()));
+                                  builder: (context) => VideoplayerPage()));
                         },
                         // ------------------------------------ ปุ่มกดเล่น ------------------------------------
                         child: Container(
@@ -562,9 +572,6 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: white,
         color: secondary,
         animationDuration: Duration(milliseconds: 300),
-        onTap: (index) {
-          print(index);
-        },
         items: [
           Icon(
             LineIcons.home,

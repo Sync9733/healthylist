@@ -8,7 +8,6 @@ import 'package:line_icons/line_icons.dart';
 
 class RegisterPage extends StatefulWidget {
   final VoidCallback showLoginPage;
-  final _genderList = ['Male', 'Female'];
   RegisterPage({Key? key, required this.showLoginPage}) : super(key: key);
 
   @override
@@ -20,10 +19,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmpasswordController = TextEditingController();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
+  final _userNameController = TextEditingController();
   final _telController = TextEditingController();
-  final _genderController = TextEditingController();
   final _weightController = TextEditingController();
   final _heightController = TextEditingController();
 
@@ -31,9 +28,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _genderController.dispose();
+    _userNameController.dispose();
     _telController.dispose();
     _weightController.dispose();
     super.dispose();
@@ -51,11 +46,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
         //add user details
         addUserDetails(
-            _firstNameController.text.trim(),
-            _lastNameController.text.trim(),
+            _userNameController.text.trim(),
             _telController.text.trim(),
             _emailController.text.trim(),
-            _genderController.text.trim(),
             int.parse(_weightController.text.trim()),
             int.parse(_heightController.text.trim()));
         //Show Error
@@ -81,14 +74,12 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  Future addUserDetails(String firstName, String lastName, String tel,
-      String email, String gender, int weight, int height) async {
+  Future addUserDetails(
+      String userName, String tel, String email, int weight, int height) async {
     await FirebaseFirestore.instance.collection('users').add({
-      'first name': firstName,
-      'last name': lastName,
+      'user name': userName,
       'tel number': tel,
       'email': email,
-      'gender': gender,
       'weight': weight,
       'height': height
     });
@@ -102,9 +93,6 @@ class _RegisterPageState extends State<RegisterPage> {
       return false;
     }
   }
-
-  List<String> items = <String>['Male', 'Female'];
-  String dropDownValue = 'Male';
 
   @override
   Widget build(BuildContext context) {
@@ -166,47 +154,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         Flexible(
                           child: TextField(
-                            controller: _firstNameController,
+                            controller: _userNameController,
                             decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'ชื่อจริง',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 12,
-                ),
-
-                //Last name
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        border: Border.all(color: white),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15.0),
-                          child: Icon(
-                            LineIcons.user,
-                            color: black.withOpacity(0.5),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Flexible(
-                          child: TextField(
-                            controller: _lastNameController,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'นามสกุล',
+                              hintText: 'ชื่อผู้ใช้งาน',
                             ),
                           ),
                         ),
@@ -253,43 +204,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
 
-                SizedBox(
-                  height: 12,
-                ),
-
-                //Gender
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        border: Border.all(color: white),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15.0),
-                          child: Icon(
-                            LineIcons.genderless,
-                            color: black.withOpacity(0.5),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Flexible(
-                          child: TextField(
-                            controller: _genderController,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'เพศ',
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
                 SizedBox(
                   height: 12,
                 ),

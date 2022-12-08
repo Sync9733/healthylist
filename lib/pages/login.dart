@@ -24,14 +24,6 @@ class _LoginPageState extends State<LoginPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: Text('Success'),
-          );
-        },
-      );
     } on FirebaseAuthException catch (e) {
       print(e);
       showDialog(
@@ -203,7 +195,7 @@ class _LoginPageState extends State<LoginPage> {
                   height: 155,
                 ),
 
-                //---------------- Sign in ----------------------
+                //---------------- Sign in Button ----------------------
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: GestureDetector(
@@ -237,8 +229,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-
-                //---------------- Sign in ----------------------
 
                 SizedBox(
                   height: 20,
