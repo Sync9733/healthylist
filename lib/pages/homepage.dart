@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,7 +20,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final user = FirebaseAuth.instance.currentUser!;
-
   List<String> docsIDs = [];
 
   Future getDocId() async {
@@ -111,6 +112,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               // ------------------------------------ BMI ------------------------------------
+              // BMI = Weight[Kg] / (Height(m)*Height(m)) )
               SizedBox(
                 height: 30,
               ),

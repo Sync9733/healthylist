@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:healthylist/colors/colors.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:line_icons/line_icons.dart';
 
 class SetupProfile extends StatefulWidget {
@@ -17,6 +20,27 @@ class _SetupProfileState extends State<SetupProfile> {
   final _userNameController = TextEditingController();
   final _weightController = TextEditingController();
   final _heightController = TextEditingController();
+
+  String imageUrl = " ";
+
+  void pickUploadImage() async {
+    final image = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 75,
+      maxHeight: 75,
+      imageQuality: 75,
+    );
+
+    Reference ref = FirebaseStorage.instance.ref().child('profilepic.jpg');
+
+    await ref.putFile(File(image!.path));
+    ref.getDownloadURL().then((value) {
+      print(value);
+      setState(() {
+        imageUrl = value;
+      });
+    });
+  }
 
   @override
   void dispose() {
@@ -116,12 +140,17 @@ class _SetupProfileState extends State<SetupProfile> {
                   padding: const EdgeInsets.only(left: 20, top: 15),
                   child: Row(
                     children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            image: DecorationImage(
-                                image: AssetImage('images/workout_3.png'))),
+                      GestureDetector(
+                        onTap: () {
+                          pickUploadImage();
+                        },
+                        child: imageUrl == " "
+                            ? Icon(
+                                Icons.person,
+                                size: 80,
+                                color: black.withOpacity(0.2),
+                              )
+                            : Image.network(imageUrl),
                       ),
                       SizedBox(
                         width: 15,
