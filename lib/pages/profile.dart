@@ -163,7 +163,7 @@ class _SetupProfileState extends State<SetupProfile> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "ชื่อผู้ใช้งาน",
+                                "Nets",
                                 style: GoogleFonts.getFont('Poppins',
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,

@@ -5,10 +5,14 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:healthylist/colors/colors.dart';
+import 'package:healthylist/pages/check_list.dart';
+import 'package:healthylist/pages/forgot_pw.dart';
 import 'package:healthylist/pages/profile.dart';
+import 'package:healthylist/pages/second_page.dart';
+import 'package:healthylist/pages/setting.dart';
 import 'package:healthylist/pages/video_page.dart';
-import 'package:healthylist/pages/welcome.dart';
 import 'package:line_icons/line_icons.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,6 +25,27 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final user = FirebaseAuth.instance.currentUser!;
   List<String> docsIDs = [];
+  int _selectedIndex = 0;
+  void _navigateToPage(int pageIndex) {
+    switch (pageIndex) {
+      case 0:
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => HomePage()));
+        break;
+      case 1:
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => SecondPage()));
+        break;
+      case 2:
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => ForgotpasswordPage()));
+        break;
+      case 3:
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => SettingPage()));
+        break;
+    }
+  }
 
   Future getDocId() async {
     await FirebaseFirestore.instance.collection('users').get().then(
@@ -83,7 +108,7 @@ class _HomePageState extends State<HomePage> {
                         height: 5,
                       ),
                       Text(
-                        ('ชื่อผู้ใช้งาน'),
+                        ('Nets'),
                         style: GoogleFonts.getFont(
                           'Poppins',
                           fontSize: 20,
@@ -148,30 +173,13 @@ class _HomePageState extends State<HomePage> {
                               Text(
                                 'คุณมีน้ำหนักอยู่ในเกณฑ์ปกติ',
                                 style: GoogleFonts.getFont('Poppins',
-                                    fontSize: 12,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w400,
                                     color: white),
                               ),
                               SizedBox(
                                 height: 19,
                               ),
-                              Container(
-                                width: 95,
-                                height: 35,
-                                decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                        colors: [fourthColor, thirdColor]),
-                                    borderRadius: BorderRadius.circular(20)),
-                                child: Center(
-                                  child: Text(
-                                    'ดูเพิ่มเติม',
-                                    style: GoogleFonts.getFont('Poppins',
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                        color: white),
-                                  ),
-                                ),
-                              )
                             ],
                           ),
                         ),
@@ -234,10 +242,18 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Center(
-                          child: Text(
-                            'ตรวจสอบ',
-                            style: GoogleFonts.getFont('Poppins',
-                                fontSize: 12, color: white),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => TodayTarget()));
+                            },
+                            child: Text(
+                              'ตรวจสอบ',
+                              style: GoogleFonts.getFont('Poppins',
+                                  fontSize: 12, color: white),
+                            ),
                           ),
                         ),
                       ),
@@ -570,30 +586,23 @@ class _HomePageState extends State<HomePage> {
       )),
       // ------------------------------------ Bottom Navigation Bar ------------------------------------
 
-      bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: white,
-        color: secondary,
-        animationDuration: Duration(milliseconds: 300),
-        items: [
-          Icon(
-            LineIcons.home,
-            color: white,
-            size: 30,
+      bottomNavigationBar: GNav(
+        activeColor: thirdColor,
+        gap: 8,
+        padding: EdgeInsets.all(16),
+        tabs: [
+          GButton(icon: Icons.home),
+          GButton(
+            icon: Icons.search,
+            onPressed: () => _navigateToPage(1),
           ),
-          Icon(
-            LineIcons.dumbbell,
-            color: white,
-            size: 30,
+          GButton(
+            icon: Icons.favorite,
+            onPressed: () => _navigateToPage(2),
           ),
-          Icon(
-            LineIcons.map,
-            color: white,
-            size: 30,
-          ),
-          Icon(
-            LineIcons.user,
-            color: white,
-            size: 30,
+          GButton(
+            icon: Icons.person,
+            onPressed: () => _navigateToPage(3),
           ),
         ],
       ),

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthylist/auth/auth_service.dart';
 import 'package:healthylist/colors/colors.dart';
 import 'package:healthylist/pages/forgot_pw.dart';
 import 'package:line_icons/line_icons.dart';
@@ -280,10 +281,13 @@ class _LoginPageState extends State<LoginPage> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: black.withOpacity(0.1))),
-                      child: Center(
-                        child: Image.asset(
-                          "images/Google.png",
-                          width: 20,
+                      child: GestureDetector(
+                        onTap: () => AuthService().signInWithGoogle(),
+                        child: Center(
+                          child: Image.asset(
+                            "images/Google.png",
+                            width: 20,
+                          ),
                         ),
                       ),
                     ),
