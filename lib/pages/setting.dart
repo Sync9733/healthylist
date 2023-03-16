@@ -439,7 +439,7 @@ class _SettingPageState extends State<SettingPage> {
             onPressed: () => _navigateToPage(1),
           ),
           GButton(
-            icon: Icons.favorite,
+            icon: Icons.map,
             onPressed: () => _navigateToPage(2),
           ),
           GButton(

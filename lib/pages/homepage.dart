@@ -1,14 +1,13 @@
 import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:healthylist/colors/colors.dart';
 import 'package:healthylist/pages/check_list.dart';
-import 'package:healthylist/pages/forgot_pw.dart';
+import 'package:healthylist/pages/gym.dart';
 import 'package:healthylist/pages/profile.dart';
 import 'package:healthylist/pages/second_page.dart';
 import 'package:healthylist/pages/setting.dart';
@@ -37,8 +36,8 @@ class _HomePageState extends State<HomePage> {
             context, MaterialPageRoute(builder: (context) => SecondPage()));
         break;
       case 2:
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => ForgotpasswordPage()));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => NearbyGym()));
         break;
       case 3:
         Navigator.push(
@@ -597,7 +596,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () => _navigateToPage(1),
           ),
           GButton(
-            icon: Icons.favorite,
+            icon: Icons.map,
             onPressed: () => _navigateToPage(2),
           ),
           GButton(

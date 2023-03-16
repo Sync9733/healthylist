@@ -5,6 +5,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:healthylist/auth/chart.dart';
+import 'package:healthylist/pages/gym.dart';
 import 'package:healthylist/pages/homepage.dart';
 import 'package:healthylist/pages/setting.dart';
 import 'package:healthylist/pages/video_page.dart';
@@ -32,7 +33,7 @@ class _SecondPageState extends State<SecondPage> {
         break;
       case 2:
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => SettingPage()));
+            context, MaterialPageRoute(builder: (context) => NearbyGym()));
         break;
       case 3:
         Navigator.push(
@@ -726,7 +727,10 @@ class _SecondPageState extends State<SecondPage> {
             icon: Icons.search,
             iconColor: thirdColor,
           ),
-          GButton(icon: Icons.favorite),
+          GButton(
+            icon: Icons.map,
+            onPressed: () => _navigateToPage(2),
+          ),
           GButton(
             icon: Icons.person,
             onPressed: () => _navigateToPage(3),
