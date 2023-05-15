@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:healthylist/pages/second_page.dart';
@@ -18,7 +20,68 @@ class NearbyGym extends StatefulWidget {
 }
 
 class _NearbyGymState extends State<NearbyGym> {
+  double latitude = 0.0;
+  double longitude = 0.0;
   int _selectedIndex = 0;
+
+  void getCurrentPosition() async {
+    // Permission
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      print("Permission not given");
+      // ขอ user permission
+      LocationPermission asked = await Geolocator.requestPermission();
+    } else {
+      Position currentPosition = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best);
+      setState(() {
+        latitude = currentPosition.latitude;
+        longitude = currentPosition.longitude;
+      });
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        latitude,
+        longitude,
+      );
+
+      String landmark = '';
+      if (placemarks != null && placemarks.isNotEmpty) {
+        Placemark placemark = placemarks[0];
+        landmark = placemark.subLocality ?? '';
+      }
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('สถานที่'),
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('$landmark'),
+                SizedBox(height: 8),
+                Text('Latitude: $latitude'),
+                SizedBox(height: 8),
+                Text('Longitude: $longitude'),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   void _navigateToPage(int pageIndex) {
     switch (pageIndex) {
       case 0:
@@ -66,6 +129,48 @@ class _NearbyGymState extends State<NearbyGym> {
               SizedBox(
                 height: 20,
               ),
+              // ปุ่ม Get current location
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 80, vertical: 0),
+                child: InkWell(
+                  onTap: getCurrentPosition,
+                  child: Container(
+                    padding: EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          spreadRadius: 1,
+                          blurRadius: 10,
+                          color: Colors.black.withOpacity(0.15),
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.location_on),
+                            SizedBox(
+                              width: 15,
+                            ),
+                            Text('User locations'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              SizedBox(
+                height: 20,
+              ),
+
               // สถานที่ 1
               Padding(
                 padding: const EdgeInsets.all(10),

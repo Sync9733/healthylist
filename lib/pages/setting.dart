@@ -5,6 +5,7 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:healthylist/pages/gym.dart';
 import 'package:healthylist/pages/profile.dart';
 import 'package:healthylist/pages/second_page.dart';
 import 'package:line_icons/line_icons.dart';
@@ -34,7 +35,7 @@ class _SettingPageState extends State<SettingPage> {
         break;
       case 2:
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => SecondPage()));
+            context, MaterialPageRoute(builder: (context) => NearbyGym()));
         break;
       case 3:
         Navigator.push(
@@ -267,36 +268,42 @@ class _SettingPageState extends State<SettingPage> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-            child: Container(
-              padding: EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: white,
-                boxShadow: [
-                  BoxShadow(
-                      spreadRadius: 1,
-                      blurRadius: 10,
-                      color: black.withOpacity(0.15),
-                      offset: Offset(0, 1))
-                ],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.people),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      Text('ข้อมูลส่วนตัว'),
-                    ],
-                  ),
-                  Icon(
-                    Icons.arrow_forward,
-                    color: Colors.grey,
-                  ),
-                ],
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SetupProfile()));
+              },
+              child: Container(
+                padding: EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: white,
+                  boxShadow: [
+                    BoxShadow(
+                        spreadRadius: 1,
+                        blurRadius: 10,
+                        color: black.withOpacity(0.15),
+                        offset: Offset(0, 1))
+                  ],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.people),
+                        SizedBox(
+                          width: 15,
+                        ),
+                        Text('ข้อมูลส่วนตัว'),
+                      ],
+                    ),
+                    Icon(
+                      Icons.arrow_forward,
+                      color: Colors.grey,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

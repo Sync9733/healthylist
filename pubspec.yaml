@@ -50,6 +50,7 @@ dependencies:
   google_nav_bar: ^5.0.6
   fl_chart: ^0.61.0
   google_sign_in: ^6.0.2
+  geocoding: ^2.1.0
 
 dev_dependencies:
   flutter_test:
